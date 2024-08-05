@@ -8,13 +8,11 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from icecream import ic
 
 from config import config
-from handlers import router
+from tools.handlers import router
 
 
-async def main():
-    cfg = config["development"]
-
-    bot = Bot(token=cfg.BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+async def main(cfg_name:str):
+    bot = Bot(token=config[cfg_name].BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(router)
 
@@ -24,4 +22,4 @@ async def main():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    asyncio.run(main())
+    asyncio.run(main("development"))
