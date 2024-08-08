@@ -1,3 +1,5 @@
+from os import getenv
+
 from aiogram import types, Router, F
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.filters import Command
@@ -6,6 +8,8 @@ from aiogram.fsm.context import FSMContext
 from tools.keyboards import *
 from tools.texts import ADMIN_CMDS, EMPL_CMDS
 
+admins = list(map(int, getenv("ADMINS", "").split(',')))
+employees = list(map(int, getenv("EMPLOYEES", "").split(',')))
 
 common_router = Router()
 
@@ -24,3 +28,9 @@ async def start_handler(msg: Message, state: FSMContext) -> None:
 async def close_menu(msg: Message, state: FSMContext) -> None:
     await state.clear()
     await msg.answer("Closing menu...", reply_markup=ReplyKeyboardRemove())
+
+
+@common_router.message(F.text.lower() == "cancel")
+async def cancel_state(msg: Message, state: FSMContext) -> None:
+    await state.clear()
+    await msg.answer("The operation was cancelled")
