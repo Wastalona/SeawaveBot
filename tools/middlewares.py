@@ -1,6 +1,6 @@
 from aiogram import types
 from aiogram.dispatcher.middlewares.base import BaseMiddleware
-from .kb import *
+
 
 # Authentication — changing the message for admins and employees
 class AccessMiddleware(BaseMiddleware):
@@ -12,11 +12,7 @@ class AccessMiddleware(BaseMiddleware):
     async def __call__(self, handler, event: types.Message, data: dict):
         user_id = event.from_user.id
 
-        if user_id in self.admins_ids:
-            await event.answer(f"Welcome sir {event.from_user.full_name}!", reply_markup=admin_kb)
-        elif user_id in self.emp_ids:
-            await event.answer("Welcome, worker!", reply_markup=employee_kb)
-        else:
+        if user_id not in self.admins_ids + self.emp_ids:
             await event.answer("Access Denied")
             return # Stopping execution without calling handler
 

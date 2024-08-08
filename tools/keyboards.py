@@ -3,7 +3,6 @@ from aiogram.types import (
     InlineKeyboardMarkup, 
     KeyboardButton, 
     ReplyKeyboardMarkup, 
-    ReplyKeyboardRemove
 )
 
 
@@ -33,8 +32,8 @@ admin_kb = ReplyKeyboardMarkup(
             KeyboardButton(text="🔔 Notify"),
         ],
         [
-            KeyboardButton(text="Add employee ⛏"),
-            KeyboardButton(text="Remove employee ⛏"),
+            KeyboardButton(text="Hire employee ⛏"),
+            KeyboardButton(text="Release employee ⛏"),
             KeyboardButton(text="Transfer employee ⚒"),
         ],
         [
@@ -46,4 +45,4 @@ admin_kb = ReplyKeyboardMarkup(
     one_time_keyboard=True
 )
 
-__all__ = ["admin_kb", "employee_kb"]
+s__all__ = ["admin_kb", "employee_kb"]
