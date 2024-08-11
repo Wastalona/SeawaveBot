@@ -13,15 +13,12 @@ class Shifts(StatesGroup):
 
 
 # ~~~ ADMIN ~~~
-class GetReports(StatesGroup):
-    reports = State()
-    report_card = State()
-
-
-class EmployeesEditor(StatesGroup):
+class StaffEditor(StatesGroup):
     hire = State()
     release = State()
     transfer = State()
     view_empl = State()
 
-notify = State()
+
+class Notification(StatesGroup):
+    notify = State()

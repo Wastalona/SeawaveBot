@@ -13,8 +13,8 @@ employee_kb = ReplyKeyboardMarkup(
             KeyboardButton(text="Close shift"),
         ],
         [
-            KeyboardButton(text="📷 Photo"),
-            KeyboardButton(text="🎬 Video"),
+            KeyboardButton(text="Photo"),
+            KeyboardButton(text="Video"),
         ],
         [
             KeyboardButton(text="✖ Close"),
@@ -27,17 +27,20 @@ employee_kb = ReplyKeyboardMarkup(
 admin_kb = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="📔 Reports"),
-            KeyboardButton(text="📝 Report card"),
-            KeyboardButton(text="🔔 Notify"),
+            KeyboardButton(text="Reports"),
+            KeyboardButton(text="Report card"),
         ],
         [
-            KeyboardButton(text="Hire employee ⛏"),
-            KeyboardButton(text="Release employee ⛏"),
-            KeyboardButton(text="Transfer employee ⚒"),
+            KeyboardButton(text="Set notify"),
+            KeyboardButton(text="Notify"),
         ],
         [
-            KeyboardButton(text="📒 Employees list"),
+            KeyboardButton(text="Hire staff"),
+            KeyboardButton(text="Release staff"),
+            KeyboardButton(text="Transfer staff"),
+        ],
+        [
+            KeyboardButton(text="Staff list"),
             KeyboardButton(text="✖ Close"),
         ]
     ],
