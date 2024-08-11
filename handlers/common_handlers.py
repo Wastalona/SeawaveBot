@@ -14,7 +14,7 @@ employees = list(map(int, getenv("EMPLOYEES", "").split(',')))
 common_router = Router()
 
 @common_router.message(F.text.lower() == "menu")
-@common_router.message(Command("start"))
+@common_router.message(Command("start", "menu"))
 async def start_handler(msg: Message, state: FSMContext) -> None:
     await state.clear()
 
@@ -25,12 +25,14 @@ async def start_handler(msg: Message, state: FSMContext) -> None:
 
 
 @common_router.message(F.text.lower() == "✖ close")
+@common_router.message(Command("close"))
 async def close_menu(msg: Message, state: FSMContext) -> None:
     await state.clear()
     await msg.answer("Closing menu...", reply_markup=ReplyKeyboardRemove())
 
 
 @common_router.message(F.text.lower() == "cancel")
+@common_router.message(Command("cancel"))
 async def cancel_state(msg: Message, state: FSMContext) -> None:
     await state.clear()
     await msg.answer("The operation was cancelled")

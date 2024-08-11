@@ -84,8 +84,3 @@ async def commit_the_comming_off(msg: Message, state: FSMContext):
     await msg.answer(REST_SHIFT)
     await state.clear()
 # ~~~ END ROUTES WITH STATES ~~~
-
-
-@employee_router.message()
-async def not_found(msg: Message):
-    await msg.reply("Sorry... The command was not recognized.")

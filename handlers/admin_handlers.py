@@ -4,50 +4,125 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
 from tools.keyboards import *
+from tools.states import Notification, StaffEditor
+from tools.texts import *
 
 
 admin_router = Router()
 
+# ~~~ SIMPLE ROUTES ~~~
 @admin_router.message(F.text.lower()  == "reports")
-@admin_router.message()
 async def reports_handler(msg: Message) -> None:
-    pass
+    try:
+        # insert logic
+        await msg.answer("Report")
+    except Exception as err:
+        await msg.answer(FAIL_LOAD_REP)
+        ic(err)
 
 @admin_router.message(F.text.lower()  == "report card")
-@admin_router.message(F.text.lower()  == "report_card")
-@admin_router.message()
+@admin_router.message(F.text.lower()  == "repcard")
 async def report_card_handler(msg: Message) -> None:
-    pass
+    try:
+        # insert logic
+        await msg.answer("Report card")
+    except Exception as err:
+        await msg.answer(FAIL_LOAD_REPCARD)
+        ic(err)
+
+@admin_router.message(F.text.lower()  == "set notify")
+async def set_notify_text_handler(msg: Message, state: FSMContext) -> None:
+    await state.clear()
+    await state.set_state(Notification.notify)
+    await msg.answer(SET_NOTIFY_TEXT)
 
 @admin_router.message(F.text.lower()  == "notify")
-@admin_router.message()
 async def notify_handler(msg: Message) -> None:
-    pass
+    try:
+        # receive notification text and employee lists
+        await msg.answer("Notify")
+    except Exception as err:
+        await msg.answer(NOTIFY_ERR)
+        ic(err)
 
-@admin_router.message(F.text.lower()  == "hire emp")
-@admin_router.message(F.text.lower()  == "hire employee")
+@admin_router.message(F.text.lower()  == "hire staff")
 @admin_router.message(F.text.lower()  == "hire")
-@admin_router.message()
-async def hire_emp_handler(msg: Message) -> None:
-    pass
+async def hire_staff_handler(msg: Message, state: FSMContext) -> None:
+    await state.clear()
+    await state.set_state(StaffEditor.hire)
+    await msg.answer(STAFF_EDIT)
 
-@admin_router.message(F.text.lower()  == "release emp")
-@admin_router.message(F.text.lower()  == "release employee")
+@admin_router.message(F.text.lower()  == "release staff")
 @admin_router.message(F.text.lower()  == "release")
-@admin_router.message(F.text.lower()  == "remove emp")
-@admin_router.message(F.text.lower()  == "remove employee")
-@admin_router.message(F.text.lower()  == "remove")
-async def release_emp_handler(msg: Message) -> None:
-    pass
+async def release_staff_handler(msg: Message, state: FSMContext) -> None:
+    await state.clear()
+    await state.set_state(StaffEditor.release)
+    await msg.answer(STAFF_EDIT)
 
-@admin_router.message(F.text.lower() == "trasnfer emp")
-@admin_router.message(F.text.lower() == "trasnfer employee")
-@admin_router.message(F.text.lower() == "trasnfer")
-async def transfer_emp_handler(msg: Message) -> None:
-    pass
+@admin_router.message(F.text.lower() == "transfer staff")
+@admin_router.message(F.text.lower() == "transfer")
+async def transfer_staff_handler(msg: Message, state: FSMContext) -> None:
+    await state.clear()
+    await state.set_state(StaffEditor.transfer)
+    await msg.answer(STAFF_TRS)
 
-@admin_router.message(F.text.lower() == "emp list")
-@admin_router.message(F.text.lower() == "employees")
-@admin_router.message(F.text.lower() == "employee list")
-async def emp_list_handler(msg: Message) -> None:
-    pass
+@admin_router.message(F.text.lower() == "staff list")
+@admin_router.message(F.text.lower() == "staff")
+async def staff_list_handler(msg: Message) -> None:
+    try:
+        # getting staff from db
+        await msg.answer("staff")
+    except Exception as err:
+        await msg.answer(STAFF_LOAD_ERR)
+        ic(err)
+# ~~~ END SIMPLE ROUTES ~~~
+
+# ~~~ ROUTES WITH STATES ~~~
+@admin_router.message(Notification.notify)
+async def setting_notift_text_handler(msg: Message, state: FSMContext):
+    try:
+        # insert logic
+        await msg.answer(NOTIFY_TEXT)
+    except Exception as err:
+        await msg.answer(SET_NOTIFY_ERR)
+        ic(err)
+    finally:
+        await state.clear()
+
+@admin_router.message(StaffEditor.hire)
+async def hiring_staff_handler(msg: Message, state: FSMContext):
+    try:
+        # insert logic
+        await msg.answer(STAFF_SUC_ADD)
+    except Exception as err:
+        await msg.answer(STAFF_ERR)
+        ic(err)
+    finally:
+        await state.clear()
+
+@admin_router.message(StaffEditor.release)
+async def releasing_staff_handler(msg: Message, state: FSMContext):
+    try:
+        # insert logic
+        await msg.answer(STAFF_SUC_REL)
+    except Exception as err:
+        await msg.answer(STAFF_ERR)
+        ic(err)
+    finally:
+        await state.clear()
+
+@admin_router.message(StaffEditor.transfer)
+async def transfering_staff_handler(msg: Message, state: FSMContext):
+    try:
+        # insert logic
+        await msg.answer(STAFF_SUC_TRS)
+    except Exception as err:
+        await msg.answer(STAFF_ERR)
+        ic(err)
+    finally:
+        await state.clear()
+# ~~~ END ROUTES WITH STATES ~~~
+
+@admin_router.message()
+async def not_found(msg: Message):
+    await msg.reply("Sorry... The command was not recognized.")

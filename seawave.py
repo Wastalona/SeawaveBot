@@ -38,10 +38,6 @@ async def main(cfg_name:str):
     dp = Dispatcher(storage=MemoryStorage()) # Change memory storage to Redis
 
     # Routes registration
-    admins = list(map(int, getenv("ADMINS", "").split(',')))
-    employees = list(map(int, getenv("EMPLOYEES", "").split(',')))
-    employee_router.message.middleware(AccessMiddleware(admins, employees))
-
     dp = routes_registration(dp)
 
     await bot.delete_webhook(drop_pending_updates=True)
