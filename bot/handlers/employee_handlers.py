@@ -4,9 +4,9 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from icecream import ic
 
-from tools.states import SendReports, Shifts
-from tools.keyboards import *
-from tools.texts import (
+from ..tools.states import SendReports, Shifts
+from ..tools.keyboards import *
+from ..tools.texts import (
     SUCC_LOAD, FAIL_LOAD, 
     WORK_SHIFT, REST_SHIFT, 
     COM_WORK_MES, COM_REST_MES
