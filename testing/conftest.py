@@ -1,28 +1,37 @@
+from asyncio import get_event_loop
 import pytest
+import pytest_asyncio
+
 from aiogram import Bot, Dispatcher
-from aiogram.client.default import DefaultBotProperties
-from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.client.session.aiohttp import AiohttpSession
 
-from bot. import main, routes_registration
-from bot.config import config
+from .mocked_bot import MockedBot
 
 
-@pytest.fixture
-def event_loop():
-    return asyncio.get_event_loop()
+@pytest_asyncio.fixture(scope="session")
+async def memory_storage():
+    storage = MemoryStorage()
+    try:
+        yield storage
+    finally:
+        await storage.close()
 
-@pytest.fixture
-async def bot() -> Bot:
-    bot = Bot(token=config['testing'].BOT_TOKEN, session=AiohttpSession(), default=DefaultBotProperties())
-    yield bot
-    await bot.session.close()
 
-@pytest.fixture
-async def dispatcher(bot: Bot) -> Dispatcher:
-    dp = Dispatcher(storage=MemoryStorage())
-    dp = routes_registration(dp)
-    yield dp
-    await dp.storage.close()
-    await dp.storage.wait_closed()
+@pytest.fixture()
+def bot():
+    return MockedBot()
+
+
+@pytest_asyncio.fixture()
+async def dispatcher():
+    dp = Dispatcher()
+    await dp.emit_startup()
+    try:
+        yield dp
+    finally:
+        await dp.emit_shutdown()
+
+
+@pytest.fixture(scope="session")
+def even_loop():
+    return get_event_loop()
