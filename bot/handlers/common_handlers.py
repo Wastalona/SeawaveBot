@@ -5,8 +5,8 @@ from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
-from tools.keyboards import *
-from tools.texts import ADMIN_CMDS, EMPL_CMDS
+from ..tools.keyboards import *
+from ..tools.texts import ADMIN_CMDS, EMPL_CMDS
 
 admins = list(map(int, getenv("ADMINS", "").split(',')))
 employees = list(map(int, getenv("EMPLOYEES", "").split(',')))

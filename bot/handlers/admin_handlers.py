@@ -3,9 +3,9 @@ from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
-from tools.keyboards import *
-from tools.states import Notification, StaffEditor
-from tools.texts import *
+from ..tools.keyboards import *
+from ..tools.states import Notification, StaffEditor
+from ..tools.texts import *
 
 
 admin_router = Router()

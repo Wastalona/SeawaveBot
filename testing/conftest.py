@@ -5,7 +5,7 @@ from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.client.session.aiohttp import AiohttpSession
 
-from bot.seawave import main, routes_registration
+from bot. import main, routes_registration
 from bot.config import config
 
 
