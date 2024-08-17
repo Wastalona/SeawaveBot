@@ -1,7 +1,11 @@
+import logging
+
 from aiogram import types, Router, F
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
+
+from icecream import ic
 
 from ..tools.keyboards import *
 from ..tools.states import Notification, StaffEditor
@@ -18,7 +22,9 @@ async def reports_handler(msg: Message) -> None:
         await msg.answer("Report")
     except Exception as err:
         await msg.answer(FAIL_LOAD_REP)
-        ic(err)
+        logging.error(f"Somthing went wrong: {err}")
+        ic(err, err.__class__)
+
 
 @admin_router.message(F.text.lower()  == "report card")
 @admin_router.message(F.text.lower()  == "repcard")
@@ -28,6 +34,7 @@ async def report_card_handler(msg: Message) -> None:
         await msg.answer("Report card")
     except Exception as err:
         await msg.answer(FAIL_LOAD_REPCARD)
+        logging.error(LOG_ERR + err)
         ic(err)
 
 @admin_router.message(F.text.lower()  == "set notify")
@@ -43,6 +50,7 @@ async def notify_handler(msg: Message) -> None:
         await msg.answer("Notify")
     except Exception as err:
         await msg.answer(NOTIFY_ERR)
+        logging.error(LOG_ERR + err)
         ic(err)
 
 @admin_router.message(F.text.lower()  == "hire staff")
@@ -74,6 +82,7 @@ async def staff_list_handler(msg: Message) -> None:
         await msg.answer("staff")
     except Exception as err:
         await msg.answer(STAFF_LOAD_ERR)
+        logging.error(LOG_ERR + err)
         ic(err)
 # ~~~ END SIMPLE ROUTES ~~~
 
@@ -85,6 +94,7 @@ async def setting_notift_text_handler(msg: Message, state: FSMContext):
         await msg.answer(NOTIFY_TEXT)
     except Exception as err:
         await msg.answer(SET_NOTIFY_ERR)
+        logging.error(LOG_ERR + err)
         ic(err)
     finally:
         await state.clear()
@@ -96,6 +106,7 @@ async def hiring_staff_handler(msg: Message, state: FSMContext):
         await msg.answer(STAFF_SUC_ADD)
     except Exception as err:
         await msg.answer(STAFF_ERR)
+        logging.error(LOG_ERR + err)
         ic(err)
     finally:
         await state.clear()
@@ -107,6 +118,7 @@ async def releasing_staff_handler(msg: Message, state: FSMContext):
         await msg.answer(STAFF_SUC_REL)
     except Exception as err:
         await msg.answer(STAFF_ERR)
+        logging.error(LOG_ERR + err)
         ic(err)
     finally:
         await state.clear()
@@ -118,6 +130,7 @@ async def transfering_staff_handler(msg: Message, state: FSMContext):
         await msg.answer(STAFF_SUC_TRS)
     except Exception as err:
         await msg.answer(STAFF_ERR)
+        logging.error(LOG_ERR + err)
         ic(err)
     finally:
         await state.clear()

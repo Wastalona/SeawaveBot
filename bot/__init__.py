@@ -3,13 +3,13 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
-from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage, Redis
 
 from decouple import config
 
-from config import config as cfg
 from .handlers import *
 from .tools.middlewares import AccessMiddleware
+from .tools.db import get_conn
 
 
 def routes_registration(dp: Dispatcher) -> Dispatcher:
@@ -31,8 +31,8 @@ def create_bot(cfg_name) -> tuple[Bot, Dispatcher]:
     logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(name)s - %(message)s - %(asctime)s')
     logger = logging.getLogger(__name__)
 
-    bot = Bot(token=cfg[cfg_name].BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-    dp = Dispatcher(storage=MemoryStorage()) # Change memory storage to Redis
-    dp = routes_registration(dp)
-    
-    return bot, dp
+    _bot_instance: Bot = Bot(token=config("BOT_TOKEN"), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    _dp_instance: Dispatcher = Dispatcher(storage=RedisStorage(redis=get_conn()))
+    _dp_instance = routes_registration(_dp_instance)
+
+    return _bot_instance, _dp_instance

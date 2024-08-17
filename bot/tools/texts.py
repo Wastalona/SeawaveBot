@@ -30,3 +30,6 @@ STAFF_SUC_ADD: str = "New staff has been successfully added."
 STAFF_SUC_REL: str = "New staff has been successfully released."
 STAFF_SUC_TRS: str = "New staff has been successfully transferred."
 STAFF_ERR: str = "An error occurred when changing staff."
+
+# Errors
+LOG_ERR: str = "Something went wrong: "
