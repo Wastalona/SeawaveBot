@@ -28,7 +28,7 @@ admin_kb = ReplyKeyboardMarkup(
     keyboard=[
         [
             KeyboardButton(text="Reports"),
-            KeyboardButton(text="Report card"),
+            KeyboardButton(text="Staff list"),
         ],
         [
             KeyboardButton(text="Set notify"),
@@ -40,7 +40,6 @@ admin_kb = ReplyKeyboardMarkup(
             KeyboardButton(text="Transfer staff"),
         ],
         [
-            KeyboardButton(text="Staff list"),
             KeyboardButton(text="✖ Close"),
         ]
     ],

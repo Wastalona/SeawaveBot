@@ -1,4 +1,5 @@
                     
+from __future__ import annotations
 import logging
 import pytz
 from datetime import datetime
@@ -10,14 +11,14 @@ from redis.exceptions import ConnectionError
 from cryptography.fernet import InvalidToken
 
 
-def get_time(tz:str = "Europe/Moscow", ts_view:bool = False):
+def get_time(tz: str = "Europe/Moscow", ts_view: bool = False) -> datetime:
     """
     tz - time zone
     ts_view - return the result in timestamp format
     This function returns the time in the selected time zone.
     """
-    _tz = pytz.all_timezones(tz) # Setting the time zone
-    return datetime.now(_tz) if ts_view else datetime.now(_tz).timestamp()
+    _tz = pytz.timezone(tz) 
+    return datetime.now(_tz).timestamp() if ts_view else datetime.now(_tz)
 
 
 def redis_exceptions(func):
@@ -39,7 +40,7 @@ def redis_exceptions(func):
             ic(err, err.__class__)
             return err
         finally:
-            await args[0].close()
+            await args[0].conn.close()
 
     return wrapper
 
@@ -55,3 +56,8 @@ def wrap_data(*data) -> dict:
     
     merge = {**json_data, **data[3]}
     return merge
+
+
+def get_bot_instance() -> Bot:
+    from .. import _bot_instance 
+    return _bot_instance

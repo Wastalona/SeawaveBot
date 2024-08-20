@@ -2,7 +2,7 @@ from __future__ import annotations
 import asyncio
 
 from bot import create_bot
-from bot.tools.db import create_temp_db, get_conn
+from bot.tools.db import DataManager
 
 
 async def shutdown(dispatcher: Dispatcher) -> None:
@@ -12,7 +12,8 @@ async def shutdown(dispatcher: Dispatcher) -> None:
 
 async def main() -> None:
     bot, dp = create_bot('development')
-    await create_temp_db(get_conn())
+    damage: DataManager = DataManager()
+    await damage.create_temp_db()
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(
