@@ -1,15 +1,16 @@
-from os import getenv
-
 from aiogram import types, Router, F
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
+from decouple import config
+
 from ..tools.keyboards import *
 from ..tools.texts import ADMIN_CMDS, EMPL_CMDS
 
-admins = list(map(int, getenv("ADMINS", "").split(',')))
-employees = list(map(int, getenv("EMPLOYEES", "").split(',')))
+
+admins = list(map(int, config("ADMINS").split(',')))
+employees = list(map(int, config("EMPLOYEES").split(',')))
 
 common_router = Router()
 

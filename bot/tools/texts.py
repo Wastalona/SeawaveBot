@@ -20,13 +20,17 @@ FAIL_LOAD_REPCARD: str = "The report card could not be loaded."
 SET_NOTIFY_TEXT: str = "Enter the notification text that you want to display."
 NOTIFY_TEXT: str = "The text of the message has been successfully installed."
 NOTIFY_ERR: str = "An error occurred while trying to send notifications."
-SET_NOTIFY_ERR: str = "An error occurred while trying to set notification text."
+SET_NOTIFY_ERR: str = "An error occurred while trying to set the notification text. Please make sure that you have set up an alert message."
 
 # Staff editor
-STAFF_TRS: str = "Here is a template \"staff_id from to\" that you can use to transfer an employee."
-STAFF_EDIT: str = "Enter the staff ID. You can get a list of IDs using the \"staff\" command."
+STAFF_TRS: str = "Here is a template \"staff_id new_profession\" that you can use to transfer an employee."
+STAFF_RELEASE: str = "Enter the staff ID. You can get a list of IDs using the \"staff\" command."
+STAFF_HIRE: str = "Enter the employee ID and profession, separated by a space. You can get a list of IDs using the \"staff\" command."
 STAFF_LOAD_ERR: str = "An error occurred while trying to get a list of employees."
 STAFF_SUC_ADD: str = "New staff has been successfully added."
 STAFF_SUC_REL: str = "New staff has been successfully released."
 STAFF_SUC_TRS: str = "New staff has been successfully transferred."
 STAFF_ERR: str = "An error occurred when changing staff."
+
+# Errors
+LOG_ERR: str = "Something went wrong: "

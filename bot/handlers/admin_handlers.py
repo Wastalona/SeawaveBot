@@ -1,34 +1,32 @@
+import logging
+
 from aiogram import types, Router, F
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
+from icecream import ic
+
 from ..tools.keyboards import *
 from ..tools.states import Notification, StaffEditor
 from ..tools.texts import *
+from ..tools.db import DataManager
+from ..tools.utils import Professions
+from ..tools.exceptions import ProfessionException
 
 
 admin_router = Router()
+damage = DataManager()
 
 # ~~~ SIMPLE ROUTES ~~~
 @admin_router.message(F.text.lower()  == "reports")
 async def reports_handler(msg: Message) -> None:
     try:
-        # insert logic
-        await msg.answer("Report")
+        await msg.answer(ic(await damage.get_info(False)))
     except Exception as err:
         await msg.answer(FAIL_LOAD_REP)
-        ic(err)
-
-@admin_router.message(F.text.lower()  == "report card")
-@admin_router.message(F.text.lower()  == "repcard")
-async def report_card_handler(msg: Message) -> None:
-    try:
-        # insert logic
-        await msg.answer("Report card")
-    except Exception as err:
-        await msg.answer(FAIL_LOAD_REPCARD)
-        ic(err)
+        logging.error(LOG_ERR + err)
+        ic(err, err.__class__)
 
 @admin_router.message(F.text.lower()  == "set notify")
 async def set_notify_text_handler(msg: Message, state: FSMContext) -> None:
@@ -39,10 +37,11 @@ async def set_notify_text_handler(msg: Message, state: FSMContext) -> None:
 @admin_router.message(F.text.lower()  == "notify")
 async def notify_handler(msg: Message) -> None:
     try:
-        # receive notification text and employee lists
-        await msg.answer("Notify")
+        await damage.notify()
+        await msg.answer("The message has been sent.")
     except Exception as err:
         await msg.answer(NOTIFY_ERR)
+        logging.error(LOG_ERR + err)
         ic(err)
 
 @admin_router.message(F.text.lower()  == "hire staff")
@@ -50,14 +49,14 @@ async def notify_handler(msg: Message) -> None:
 async def hire_staff_handler(msg: Message, state: FSMContext) -> None:
     await state.clear()
     await state.set_state(StaffEditor.hire)
-    await msg.answer(STAFF_EDIT)
+    await msg.answer(STAFF_HIRE)
 
 @admin_router.message(F.text.lower()  == "release staff")
 @admin_router.message(F.text.lower()  == "release")
 async def release_staff_handler(msg: Message, state: FSMContext) -> None:
     await state.clear()
     await state.set_state(StaffEditor.release)
-    await msg.answer(STAFF_EDIT)
+    await msg.answer(STAFF_RELEASE)
 
 @admin_router.message(F.text.lower() == "transfer staff")
 @admin_router.message(F.text.lower() == "transfer")
@@ -70,10 +69,10 @@ async def transfer_staff_handler(msg: Message, state: FSMContext) -> None:
 @admin_router.message(F.text.lower() == "staff")
 async def staff_list_handler(msg: Message) -> None:
     try:
-        # getting staff from db
-        await msg.answer("staff")
+        await msg.answer(await damage.get_info(True))
     except Exception as err:
         await msg.answer(STAFF_LOAD_ERR)
+        logging.error(LOG_ERR + err)
         ic(err)
 # ~~~ END SIMPLE ROUTES ~~~
 
@@ -81,10 +80,11 @@ async def staff_list_handler(msg: Message) -> None:
 @admin_router.message(Notification.notify)
 async def setting_notift_text_handler(msg: Message, state: FSMContext):
     try:
-        # insert logic
+        await damage.set_notify(msg.text)
         await msg.answer(NOTIFY_TEXT)
     except Exception as err:
         await msg.answer(SET_NOTIFY_ERR)
+        logging.error(LOG_ERR + err)
         ic(err)
     finally:
         await state.clear()
@@ -92,10 +92,19 @@ async def setting_notift_text_handler(msg: Message, state: FSMContext):
 @admin_router.message(StaffEditor.hire)
 async def hiring_staff_handler(msg: Message, state: FSMContext):
     try:
-        # insert logic
+        _id, profession = msg.text.split(' ')
+        ic(_id, profession)
+        if profession.upper() not in Professions:
+            raise ProfessionException()
+        
+        await damage.hire_person(_id, profession)
         await msg.answer(STAFF_SUC_ADD)
+    except ProfessionException:
+        await msg.answer("Error - wrong profession.")
+        logging.error(LOG_ERR + "Wrong profession.")
     except Exception as err:
         await msg.answer(STAFF_ERR)
+        logging.error(f"{LOG_ERR} {err}")
         ic(err)
     finally:
         await state.clear()
@@ -103,10 +112,11 @@ async def hiring_staff_handler(msg: Message, state: FSMContext):
 @admin_router.message(StaffEditor.release)
 async def releasing_staff_handler(msg: Message, state: FSMContext):
     try:
-        # insert logic
+        await damage.release_person(msg.text)
         await msg.answer(STAFF_SUC_REL)
     except Exception as err:
         await msg.answer(STAFF_ERR)
+        logging.error(f"{LOG_ERR} {err}")
         ic(err)
     finally:
         await state.clear()
@@ -114,10 +124,12 @@ async def releasing_staff_handler(msg: Message, state: FSMContext):
 @admin_router.message(StaffEditor.transfer)
 async def transfering_staff_handler(msg: Message, state: FSMContext):
     try:
-        # insert logic
+        _id, dest = msg.text.split(' ')
+        await damage.transfer_emp(_id, dest)
         await msg.answer(STAFF_SUC_TRS)
     except Exception as err:
         await msg.answer(STAFF_ERR)
+        logging.error(f"{LOG_ERR} {err}")
         ic(err)
     finally:
         await state.clear()
