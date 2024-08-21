@@ -9,6 +9,7 @@ from icecream import ic
 
 from redis.exceptions import ConnectionError
 from cryptography.fernet import InvalidToken
+from ..tools.utils import DaysPeriods
 
 
 def get_time(tz: str = "Europe/Moscow", ts_view: bool = False) -> datetime:
@@ -61,3 +62,16 @@ def wrap_data(*data) -> dict:
 def get_bot_instance() -> Bot:
     from .. import _bot_instance 
     return _bot_instance
+
+
+def get_dayperiod(time: int) -> str | None:
+    return next((day.name for day in DaysPeriods if time in day.value), None)
+
+def filter_by_dayperiod(reports: tuple) -> tuple[set, set]:
+    time = get_dayperiod(datetime.now().hour)
+    
+    photos = reports[1].get('photos', {}).get(time, [])
+    videos = reports[1].get('videos', {}).get(time, [])
+
+    return *photos, *videos
+

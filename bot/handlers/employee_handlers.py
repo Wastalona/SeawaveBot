@@ -11,21 +11,23 @@ from ..tools.texts import (
     WORK_SHIFT, REST_SHIFT, 
     COM_WORK_MES, COM_REST_MES
 )
+from ..tools.db import DataManager
 
 
 employee_router = Router()
+damage = DataManager()
 
 
 # ~~~ SIMPLE ROUTES ~~~
-@employee_router.message(F.text.lower() == "photos")
-@employee_router.message(F.text.lower() == "📷 photo")
+@employee_router.message(F.text.lower() == "photo")
+@employee_router.message(F.text.lower() == "📷")
 async def photo_report_handler(msg: Message, state: FSMContext) -> None:
     await state.clear()
     await state.set_state(SendReports.photo)
     await msg.answer("Send me your photo report. Make sure that you have selected image compression.")
 
-@employee_router.message(F.text.lower() == "videos")
-@employee_router.message(F.text.lower() == "🎬 video")
+@employee_router.message(F.text.lower() == "video")
+@employee_router.message(F.text.lower() == "📹")
 async def video_report_handler(msg: Message, state: FSMContext) -> None:
     await state.clear()
     await state.set_state(SendReports.video)
@@ -51,8 +53,7 @@ async def close_shift_handler(msg: Message, state: FSMContext) -> None:
 @employee_router.message(F.photo, SendReports.photo)
 async def getting_photo_report_handler(msg: Message, state: FSMContext) -> None:
     try:
-        ic([img.file_id for img in msg.photo])
-        # insert logic
+        await damage.update_key(msg.from_user.id, "photos", msg.photo[-1].file_id)
         await msg.answer(SUCC_LOAD)
     except Exception as err:
         await msg.answer(FAIL_LOAD)
@@ -63,8 +64,7 @@ async def getting_photo_report_handler(msg: Message, state: FSMContext) -> None:
 @employee_router.message(F.video, SendReports.video)
 async def getting_video_report_handler(msg: Message, state: FSMContext) -> None:
     try:
-        ic([vid.file_id for vid in msg.video])
-        # insert logic
+        await damage.update_key(msg.from_user.id, "videos", msg.video.file_id)
         await msg.answer(SUCC_LOAD)
     except Exception as err:
         await msg.answer(FAIL_LOAD)
