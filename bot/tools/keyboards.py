@@ -9,14 +9,8 @@ from aiogram.types import (
 employee_kb = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text="Open shift"),
-            KeyboardButton(text="Close shift"),
-        ],
-        [
             KeyboardButton(text="Photo"),
             KeyboardButton(text="Video"),
-        ],
-        [
             KeyboardButton(text="✖ Close"),
         ]
     ],

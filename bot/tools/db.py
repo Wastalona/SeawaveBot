@@ -6,7 +6,7 @@ from decouple import config
 from cryptography.fernet import Fernet
 from icecream import ic
 
-from .helpers import redis_exceptions, wrap_data, get_time, get_bot_instance
+from .helpers import *
 from .utils import Singleton, Professions
 from .exceptions import StaffEditException, NotifyException
 
@@ -77,8 +77,8 @@ class DataManager(metaclass=Singleton):
             return
 
         person_info: dict = {
-            "videos": [],
-            "photos": [],
+            "videos": {},
+            "photos": {},
             "profession": profession
         }
 
@@ -98,19 +98,26 @@ class DataManager(metaclass=Singleton):
 
         await self.del_employee(person_id)
 
-    # @redis_exceptions
+    @redis_exceptions
     async def transfer_emp(self, person_id: int, dest: Professions | str) -> None:
         if dest is None:
             raise StaffEditException("No profession have been found.")
         
+        if person_id.lower() == dest.lower():
+            return
+
         if person_id.lower() == Professions.ADMIN.value:
             await self.del_admin(person_id)
             await self.hire_person(person_id, dest)
             return 
-        
+        elif dest.lower() == Professions.ADMIN.value:
+            await self.release_person(person_id)
+            await self.hire_person(person_id, dest)
+            return
+
         await self.update_key(person_id, "profession", dest)
 
-    async def get_info(self, what_need: bool) -> str:
+    async def get_info(self, what_need: bool) -> tuple[str, list]:
         """
         what_need = 1 - staff list | 0 - reports
         """
@@ -119,21 +126,14 @@ class DataManager(metaclass=Singleton):
         if what_need:
             admins = "\n".join([i.decode() for i in await self.conn.smembers("_admins")])
             empls = "\n".join(empls)
-            return f"Admins:\n{admins}\nEmployess:{empls}"
+            return f"Admins:\n{admins}\n\nEmployess:{empls}"
         
         time = get_time()
-        report = ""
-        if time.hour in range(6, 11):
-            report = "Morning report"
-        elif time.hour in range(11, 15):
-            report = "Afternoon report"
-        elif time.hour in range(15, 22):
-            report = "Dinner report"
-
-        reports = await self.fetch_info(empls)
+        report = await self.fetch_info(empls)
+        reports = list(map(set, map(filter_by_dayperiod, report.items())))
         ic(reports)
         
-        return f"=== {report} - {time} ===\n"
+        return f"=== {get_dayperiod(time.hour)} report - {time.strftime("%B %d, %Y")} ===", reports
 
     async def get_prof(self, person_id) -> str | None:
         if person_id in ic([i.decode() for i in await self.conn.smembers("_admins")]):
@@ -144,15 +144,12 @@ class DataManager(metaclass=Singleton):
             return None
         
         return ic(json.loads(empl).get("profession"))
-
-    async def push_report(self, empl_id: int | str, report: str) -> None:
-        pass
     # END
 
     # Notifications
     @redis_exceptions
     async def notify(self) -> None:
-        msg = await self.conn.get("notify")        
+        msg = await self.conn.get("notify").decode()       
         await get_bot_instance().send_message(config("COMMON_CHAT"), f"=== Notification ===\n\n{msg}")
     
     @redis_exceptions
@@ -161,10 +158,18 @@ class DataManager(metaclass=Singleton):
     # END
 
     # Common
-    # @redis_exceptions
+    @redis_exceptions
     async def update_key(self, _id: int | str, key: str | int, new_value: str | int) -> None:
         info = ic(await self.fetch_info([_id]))
-        info[_id][key] = new_value
+        if key in ["photos", "videos"]:
+            time = get_dayperiod(get_time().hour)
+            try:
+                info[_id][key][f"{time}"].append(new_value)
+            except KeyError:
+                info[_id][key][f"{time}"] = []
+                info[_id][key][f"{time}"].append(new_value)
+        else:
+            info[_id][key] = new_value
 
         await self.conn.hset(_id, "info", json.dumps(info[_id]))
 
@@ -186,13 +191,13 @@ class DataManager(metaclass=Singleton):
 
     async def fetch_info(self, empls: set | list) -> dict:
         """extension for the save_local method"""
-        reports = {}
+        info = {}
         for emp_id in empls:
             if emp_id:
                 emp_id_decoded = emp_id.decode() if isinstance(emp_id, bytes) else emp_id
                 employee_data = json.loads(await self.conn.hget(emp_id, "info"))
-                reports[emp_id_decoded] = employee_data
-        return reports
+                info[emp_id_decoded] = employee_data
+        return info
     #END
 
     # Basics
@@ -219,7 +224,7 @@ class DataManager(metaclass=Singleton):
 
     def __str__(self) -> str:
         logging.info("[ + ] Getting information about the DataManager for the user")
-        return ""
+        return "DataManager class "
     
     def __repr__(self) -> str:
         logging.info("[ + ] Getting information about the DataManager for the developer")
