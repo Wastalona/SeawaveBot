@@ -5,12 +5,7 @@ from aiogram.fsm.state import StatesGroup, State
 class SendReports(StatesGroup):
     photo = State()
     video = State()
-
-
-class Shifts(StatesGroup):
-    open_ = State()
-    close_ = State()
-
+    
 
 # ~~~ ADMIN ~~~
 class StaffEditor(StatesGroup):

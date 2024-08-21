@@ -6,12 +6,6 @@ EMPL_CMDS: str = "Employee commands:\n1. photo_report\n2. video_report\n3. open_
 SUCC_LOAD: str = "The report has been uploaded successfully."
 FAIL_LOAD: str = "An error occurred while uploading reports."
 
-# Shifts
-WORK_SHIFT: str = "You can start your work, you are marked."
-REST_SHIFT: str = "You are marked, you can take a break and relax."
-COM_WORK_MES: str = "Send me the message \"coming on shift\"."
-COM_REST_MES: str = "Send me the message \"coming off shift\"."
-
 # Admin reports
 FAIL_LOAD_REP: str = "Reports could not be loaded."
 FAIL_LOAD_REPCARD: str = "The report card could not be loaded."
