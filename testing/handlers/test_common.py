@@ -6,18 +6,18 @@ from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
-from bot.handlers.common_handlers import (
+from ...bot.handlers.common_handlers import (
     start_handler, close_menu, cancel_state
 )
-from bot.tools.keyboards import *
-from bot.tools.texts import ADMIN_CMDS, EMPL_CMDS
+from ...bot.tools.keyboards import *
+from ...bot.tools.texts import ADMIN_CMDS, EMPL_CMDS
 
 from ..utils import *
 
 
 
 @pytest.mark.asyncio
-async def test_emp_start_handler(memory_storage, bot):
+async def test_emp_start_handler(redis_storage, bot):
     message: Message = AsyncMock(
         id = 1,
         date = datetime.now(),
@@ -27,7 +27,7 @@ async def test_emp_start_handler(memory_storage, bot):
     )
 
     state: FSMContext = FSMContext(
-        storage=memory_storage,
+        storage=await redis_storage,
         key=StorageKey(
             bot_id=bot.id,
             chat_id=TEST_CHAT.id,
@@ -40,7 +40,7 @@ async def test_emp_start_handler(memory_storage, bot):
     message.answer.assert_called_with(EMPL_CMDS, reply_markup=employee_kb)
 
 @pytest.mark.asyncio
-async def test_admin_start_handler(memory_storage, bot):
+async def test_admin_start_handler(redis_storage, bot):
     message: Message = AsyncMock(
         id = 1,
         date = datetime.now(),
@@ -50,7 +50,7 @@ async def test_admin_start_handler(memory_storage, bot):
     )
 
     state: FSMContext = FSMContext(
-        storage=memory_storage,
+        storage=await redis_storage,
         key=StorageKey(
             bot_id=bot.id,
             chat_id=TEST_CHAT.id,
@@ -63,7 +63,7 @@ async def test_admin_start_handler(memory_storage, bot):
     message.answer.assert_called_with(ADMIN_CMDS, reply_markup=admin_kb)
 
 @pytest.mark.asyncio
-async def test_user_start_handler(memory_storage, bot):
+async def test_user_start_handler(redis_storage, bot):
     message: Message = AsyncMock(
         id = 1,
         date = datetime.now(),
@@ -73,7 +73,7 @@ async def test_user_start_handler(memory_storage, bot):
     )
 
     state: FSMContext = FSMContext(
-        storage=memory_storage,
+        storage=await redis_storage,
         key=StorageKey(
             bot_id=bot.id,
             chat_id=TEST_CHAT.id,
@@ -86,7 +86,7 @@ async def test_user_start_handler(memory_storage, bot):
     message.answer.assert_not_called()
 
 @pytest.mark.asyncio
-async def test_close_menu_handler(memory_storage, bot):
+async def test_close_menu_handler(redis_storage, bot):
     message = AsyncMock(
         id = 3,
         date = datetime.now(),
@@ -96,7 +96,7 @@ async def test_close_menu_handler(memory_storage, bot):
     )
 
     state: FSMContext = FSMContext(
-        storage=memory_storage,
+        storage=await redis_storage,
         key=StorageKey(
             bot_id=bot.id,
             chat_id=TEST_CHAT.id,
@@ -109,7 +109,7 @@ async def test_close_menu_handler(memory_storage, bot):
     message.answer.assert_awaited_with("Closing menu...", reply_markup=ReplyKeyboardRemove())
 
 @pytest.mark.asyncio
-async def test_close_menu_by_user_handler(memory_storage, bot):
+async def test_close_menu_by_user_handler(redis_storage, bot):
     message: Message = AsyncMock(
         id = 1,
         date = datetime.now(),
@@ -119,7 +119,7 @@ async def test_close_menu_by_user_handler(memory_storage, bot):
     )
 
     state: FSMContext = FSMContext(
-        storage=memory_storage,
+        storage=await redis_storage,
         key=StorageKey(
             bot_id=bot.id,
             chat_id=TEST_CHAT.id,
@@ -132,7 +132,7 @@ async def test_close_menu_by_user_handler(memory_storage, bot):
     message.assert_not_called()
 
 @pytest.mark.asyncio
-async def test_cancel_handler(memory_storage, bot):
+async def test_cancel_handler(redis_storage, bot):
     message = AsyncMock(
         id = 3,
         date = datetime.now(),
@@ -142,7 +142,7 @@ async def test_cancel_handler(memory_storage, bot):
     )
 
     state: FSMContext = FSMContext(
-        storage=memory_storage,
+        storage=await redis_storage,
         key=StorageKey(
             bot_id=bot.id,
             chat_id=TEST_CHAT.id,

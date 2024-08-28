@@ -42,14 +42,16 @@ async def set_notify_text_handler(msg: Message, state: FSMContext) -> None:
     await msg.answer(SET_NOTIFY_TEXT)
 
 @admin_router.message(F.text.lower()  == "notify")
-async def notify_handler(msg: Message) -> None:
+async def notify_handler(msg: Message) -> bool:
     try:
-        await damage.notify()
-        await msg.answer("The message has been sent.")
+        text = "The message has been sent." if await damage.notify() else "You forgot to set up the notification."
+        await msg.answer(text)
+        return True
     except Exception as err:
         await msg.answer(NOTIFY_ERR)
         logging.error(f"{LOG_ERR} {err}")
         ic(err)
+        return False
 
 @admin_router.message(F.text.lower()  == "hire staff")
 @admin_router.message(F.text.lower()  == "hire")

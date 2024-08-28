@@ -36,12 +36,8 @@ def redis_exceptions(func):
             logging.error("Connection error, check your internet connection or server connection.")
             ic(err, err.__class__)
             return err
-        except Exception as err:
-            logging.error(f"Something went wrong: {err}.\nClass error = {err.__class__}")
-            ic(err, err.__class__)
-            return err
         finally:
-            await args[0].conn.close()
+            await args[0].conn.aclose()
 
     return wrapper
 
