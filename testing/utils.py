@@ -1,4 +1,5 @@
 from aiogram.types import User, Chat
+from ..bot.tools.utils import Professions
 
 
 TEST_ADMIN = User(
@@ -94,3 +95,37 @@ TEST_CHAT = Chat(
      sticker_set_name=None, 
      unrestrict_boost_count=None
 )
+
+DB_USER = {
+    "id": "1231231230",
+    "profession": Professions.BACKER,
+    "new_profession": Professions.CLEANER,
+    "old_profession": Professions.BACKER
+}
+
+DB_USER_0 = {
+    "id": "0",
+    "profession": Professions.WAITER,
+    "new_profession": Professions.ADMIN,
+    "old_profession": Professions.WAITER
+}
+
+DB_ADMIN = {
+    "id": "-999",
+    "profession": Professions.ADMIN,
+    "old_profession": Professions.ADMIN,
+    "new_profession": Professions.WAITER
+}
+
+TEST_DB_QUERIES = {
+    "DB_INIT": {},
+    "EMPLOYEES_INSERT": {},
+    "TEST_PROFESSIONS": {
+        "admin"
+    }
+}
+
+TEST_MSG: str = "TEST MESSAGE"
+
+def parse_bytes(obj) -> list:
+    return [i.decode() for i in obj]

@@ -65,7 +65,9 @@ class DataManager(metaclass=Singleton):
         await self.conn.lpush("employees_ids", ' '.join(data.pop("employees_ids", [])))
 
         for key, value in data.items():
-            await self.conn.hset(key, "info", f"{value}")
+            ic(key, value)
+            ic(await self.conn.keys("*"))
+            await self.conn.hset(key, "info", str(value))
     # END
     
     # CRUD methods
@@ -103,11 +105,22 @@ class DataManager(metaclass=Singleton):
         if dest is None:
             raise StaffEditException("No profession have been found.")
         
-        if person_id.lower() == Professions.ADMIN.value:
+        src = await self.get_prof(person_id)
+        admin = Professions.ADMIN.value
+
+        if person_id == config("OWNER") or (src == admin and dest == admin):
+            return
+
+        if src == admin:
             await self.del_admin(person_id)
             await self.hire_person(person_id, dest)
             return 
         
+        if dest == admin:
+            await self.del_employee(person_id)
+            await self.hire_person(person_id, dest)
+            return
+            
         await self.update_key(person_id, "profession", dest)
 
     async def get_info(self, what_need: bool) -> str:
@@ -151,10 +164,12 @@ class DataManager(metaclass=Singleton):
 
     # Notifications
     @redis_exceptions
-    async def notify(self) -> None:
-        msg = await self.conn.get("notify")        
-        await get_bot_instance().send_message(config("COMMON_CHAT"), f"=== Notification ===\n\n{msg}")
-    
+    async def notify(self) -> bool:
+        msg = await self.conn.get("notify")       
+        if not msg: return False
+        await get_bot_instance().send_message(config("COMMON_CHAT"), f"=== Notification ===\n\n{msg.decode()}")
+        return True
+
     @redis_exceptions
     async def set_notify(self, notify_msg: str) -> None:
         await self.conn.set("notify", notify_msg)
