@@ -22,10 +22,17 @@ damage = DataManager()
 @admin_router.message(F.text.lower()  == "reports")
 async def reports_handler(msg: Message) -> None:
     try:
-        await msg.answer(ic(await damage.get_info(False)))
+        answer, reports = ic(await damage.get_info(False))
+        await msg.answer(answer)
+        if not reports:
+            return
+        if reports[0]:
+            [await msg.answer_photo(rep) for rep in reports[0]]
+        if reports[1]:
+            [await msg.answer_video(rep) for rep in reports[1]]
     except Exception as err:
         await msg.answer(FAIL_LOAD_REP)
-        logging.error(LOG_ERR + err)
+        logging.error(f"{LOG_ERR} {err}")
         ic(err, err.__class__)
 
 @admin_router.message(F.text.lower()  == "set notify")
@@ -42,7 +49,7 @@ async def notify_handler(msg: Message) -> bool:
         return True
     except Exception as err:
         await msg.answer(NOTIFY_ERR)
-        logging.error(LOG_ERR + err)
+        logging.error(f"{LOG_ERR} {err}")
         ic(err)
         return False
 
@@ -74,7 +81,7 @@ async def staff_list_handler(msg: Message) -> None:
         await msg.answer(await damage.get_info(True))
     except Exception as err:
         await msg.answer(STAFF_LOAD_ERR)
-        logging.error(LOG_ERR + err)
+        logging.error(f"{LOG_ERR} {err}")
         ic(err)
 # ~~~ END SIMPLE ROUTES ~~~
 
@@ -86,7 +93,7 @@ async def setting_notift_text_handler(msg: Message, state: FSMContext):
         await msg.answer(NOTIFY_TEXT)
     except Exception as err:
         await msg.answer(SET_NOTIFY_ERR)
-        logging.error(LOG_ERR + err)
+        logging.error(f"{LOG_ERR} {err}")
         ic(err)
     finally:
         await state.clear()
